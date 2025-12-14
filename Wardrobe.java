@@ -1,125 +1,181 @@
-import java.util.ArrayList; // Importing ArrayList from java.util package
-import java.util.List; // Importing List from java.util package
+import java.util.ArrayList;
+import java.util.List;
 
-
-// WARDROBE CLASS: represents the user's stored collection of clothing items.
+/**
+ **Final Project: Virtual Wardrobe
+ *
+ * Stores clothing items in category lists and can return a random item by category.
+ */
 public class Wardrobe {
 
-    // creates a list to store clothing items by category
-    private List<ClothingItem> outerwear;
-    private List<ClothingItem> tops;
-    private List<ClothingItem> bottoms;
-    private List<ClothingItem> shoes;
-    private List<ClothingItem> hats;
+    // Lists for each clothing category
+    private List<ClothingItem> outerwearList;
+    private List<ClothingItem> topList;
+    private List<ClothingItem> bottomList;
+    private List<ClothingItem> shoeList;
+    private List<ClothingItem> hatList;
 
-    // CONSTRUCTOR: initializes the lists for each category
+    // Builds an empty wardrobe and initializes all category lists.
+    // The constructor is public, so it can be accessed from outside the class.
     public Wardrobe() {
-        outerwear = new ArrayList<>();
-        tops = new ArrayList<>();
-        bottoms = new ArrayList<>();
-        shoes = new ArrayList<>();
-        hats = new ArrayList<>();
+        outerwearList = new ArrayList<ClothingItem>();
+        topList = new ArrayList<ClothingItem>();
+        bottomList = new ArrayList<ClothingItem>();
+        shoeList = new ArrayList<ClothingItem>();
+        hatList = new ArrayList<ClothingItem>();
     }
 
-    // ADD ITEM METHOD: adds a clothing item to the appropriate list based on its category
+    // Adds an outerwear item if it is not null and passes basic validation.
     public void addOuterwear(ClothingItem item) {
         if (item != null && item.isValid()) {
-            outerwear.add(item);
+            outerwearList.add(item);
         }
     }
 
+    // Adds a top item if it is not null and passes basic validation.
     public void addTop(ClothingItem item) {
         if (item != null && item.isValid()) {
-            tops.add(item);
+            topList.add(item);
         }
     }
 
+    // Adds a bottom item if it is not null and passes basic validation.
     public void addBottom(ClothingItem item) {
         if (item != null && item.isValid()) {
-            bottoms.add(item);
+            bottomList.add(item);
         }
     }
 
-    public void addShoes(ClothingItem item) {
+    // Adds a shoe item if it is not null and passes basic validation.
+    public void addShoe(ClothingItem item) {
         if (item != null && item.isValid()) {
-            shoes.add(item);
+            shoeList.add(item);
         }
     }
 
+    // Adds a hat item if it is not null and passes basic validation.
     public void addHat(ClothingItem item) {
         if (item != null && item.isValid()) {
-            hats.add(item);
+            hatList.add(item);
         }
     }
 
-    // REMOVE ITEM METHOD: removes a clothing item from the appropriate list based on its category
+    // Removes an outerwear item from the wardrobe.
     public void removeOuterwear(ClothingItem item) {
-        outerwear.remove(item);
+        outerwearList.remove(item);
     }
 
+    // Removes a top item from the wardrobe.
     public void removeTop(ClothingItem item) {
-        tops.remove(item);
+        topList.remove(item);
     }
 
+    // Removes a bottom item from the wardrobe.
     public void removeBottom(ClothingItem item) {
-        bottoms.remove(item);
+        bottomList.remove(item);
     }
 
-    public void removeShoes(ClothingItem item) {
-        shoes.remove(item);
+    // Removes a shoe item from the wardrobe.
+    public void removeShoe(ClothingItem item) {
+        shoeList.remove(item);
     }
 
+    // Removes a hat item from the wardrobe.
     public void removeHat(ClothingItem item) {
-        hats.remove(item);
+        hatList.remove(item);
     }
 
-    // GETTERS FOR LISTS: returns the list of clothing items for a specific category.
+    // Returns the list of outerwear items.
+    public List<ClothingItem> getOuterwearList() {
+        return outerwearList;
+    }
+
+    // Returns the list of top items.
+    public List<ClothingItem> getTopList() {
+        return topList;
+    }
+
+    // Returns the list of bottom items.
+    public List<ClothingItem> getBottomList() {
+        return bottomList;
+    }
+
+    // Returns the list of shoe items.
+    public List<ClothingItem> getShoeList() {
+        return shoeList;
+    }
+
+    // Returns the list of hat items.
+    public List<ClothingItem> getHatList() {
+        return hatList;
+    }
+
+    // Getter names used by the JavaFX GUI.
     public List<ClothingItem> getOuterwear() {
-        return outerwear;
+        return outerwearList;
     }
 
     public List<ClothingItem> getTops() {
-        return tops;
+        return topList;
     }
 
     public List<ClothingItem> getBottoms() {
-        return bottoms;
+        return bottomList;
     }
 
     public List<ClothingItem> getShoes() {
-        return shoes;
+        return shoeList;
     }
 
     public List<ClothingItem> getHats() {
-        return hats;
+        return hatList;
     }
 
-    //HELPER METHODS: returns a random item from a list or null if the list is empty.
-    private ClothingItem getRandomItem(List<ClothingItem> items) {
-        if (items == null || items.isEmpty()) {
+    // Wrapper names used by the JavaFX GUI for add/remove.
+    public void addShoes(ClothingItem item) {
+        addShoe(item);
+    }
+
+    public void removeShoes(ClothingItem item) {
+        removeShoe(item);
+    }
+
+    // Wrapper name used by OutfitGenerator.
+    public ClothingItem getRandomShoes() {
+        return getRandomShoe();
+    }
+
+    // Returns a random item from a list, or null if the list is empty.
+    private ClothingItem pickRandomItem(List<ClothingItem> items) {
+        if (items == null || items.size() == 0) {
             return null;
         }
-        int index = (int) (Math.random() * items.size());
+        int index = (int)(Math.random() * items.size());
         return items.get(index);
     }
 
+    // Returns a random outerwear item, or null if none exist.
     public ClothingItem getRandomOuterwear() {
-        return getRandomItem(outerwear);
+        return pickRandomItem(outerwearList);
     }
 
+    // Returns a random top item, or null if none exist.
     public ClothingItem getRandomTop() {
-        return getRandomItem(tops);
+        return pickRandomItem(topList);
     }
 
+    // Returns a random bottom item, or null if none exist.
     public ClothingItem getRandomBottom() {
-        return getRandomItem(bottoms);
+        return pickRandomItem(bottomList);
     }
 
-    public ClothingItem getRandomShoes() {
-        return getRandomItem(shoes);
+    // Returns a random shoe item, or null if none exist.
+    public ClothingItem getRandomShoe() {
+        return pickRandomItem(shoeList);
     }
 
+    // Returns a random hat item, or null if none exist.
     public ClothingItem getRandomHat() {
-        return getRandomItem(hats);
+        return pickRandomItem(hatList);
     }
 }

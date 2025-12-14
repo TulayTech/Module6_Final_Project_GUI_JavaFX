@@ -1,119 +1,135 @@
 /**
-    **OUTFITGENERATOR:
-    uses a Wardrobe and an Event to build a suggested outfit.
-*/
-
-/**
- * OutfitGenerator uses a Wardrobe and an Event to build a suggested outfit.
- * This class does not depend on any user interface code.
+ **Final Project: Virtual Wardrobe
+ *
+ * Builds an outfit suggestion by selecting random items from a Wardrobe
+ * using details from an Event.
  */
 public class OutfitGenerator {
 
     private Wardrobe wardrobe;
 
-    // Fields to remember the last selected outfit
+    // The currently selected outfit pieces
     private ClothingItem selectedTop;
     private ClothingItem selectedBottom;
     private ClothingItem selectedOuterwear;
-    private ClothingItem selectedShoes;
+    private ClothingItem selectedShoe;
     private ClothingItem selectedHat;
 
-    // Constructor to initialize the wardrobe so we know where to pick items from.
+    // Creates an OutfitGenerator that pulls items from the given wardrobe.
     public OutfitGenerator(Wardrobe wardrobe) {
         this.wardrobe = wardrobe;
+        clearSelection();
     }
 
-    // Generates an outfit based on the given Event context.
+    // Generates an outfit based on the event type and recommended weather.
     public void generateOutfit(Event event) {
         if (event == null || !event.isValid()) {
             clearSelection();
             return;
         }
 
-        // Base outfit pieces (top, bottom, shoes)
+        // Always pick the base items first
         selectedTop = wardrobe.getRandomTop();
         selectedBottom = wardrobe.getRandomBottom();
-        selectedShoes = wardrobe.getRandomShoes();
+        selectedShoe = wardrobe.getRandomShoe();
 
-        // Outerwear: required for "Business" or "Cold" events
-        if ("Business".equalsIgnoreCase(event.getEventType())
-                || "Cold".equalsIgnoreCase(event.getRecommendedWeather())) {
+        // Add outerwear for business events or cold weather
+        if (isBusinessEvent(event) || isColdWeather(event)) {
             selectedOuterwear = wardrobe.getRandomOuterwear();
         } else {
             selectedOuterwear = null;
         }
 
-        // Hat: optional for "Casual" or "Sunny" events
-        if ("Casual".equalsIgnoreCase(event.getEventType())
-                || "Sunny".equalsIgnoreCase(event.getRecommendedWeather())) {
+        // Add a hat for casual events or sunny weather
+        if (isCasualEvent(event) || isSunnyWeather(event)) {
             selectedHat = wardrobe.getRandomHat();
         } else {
             selectedHat = null;
         }
     }
 
-    // Clears the current selection
+    // Clears the current outfit selection.
+    // This is called when an invalid event is provided.
     private void clearSelection() {
         selectedTop = null;
         selectedBottom = null;
         selectedOuterwear = null;
-        selectedShoes = null;
+        selectedShoe = null;
         selectedHat = null;
     }
 
-    // Getters for the selected items
+    // Returns true if the event type is Business.
+    private boolean isBusinessEvent(Event event) {
+        return "Business".equalsIgnoreCase(event.getEventType());
+    }
 
+    // Returns true if the event type is Casual.
+    private boolean isCasualEvent(Event event) {
+        return "Casual".equalsIgnoreCase(event.getEventType());
+    }
+
+    // Returns true if the recommended weather is Cold.
+    private boolean isColdWeather(Event event) {
+        return "Cold".equalsIgnoreCase(event.getRecommendedWeather());
+    }
+
+    // Returns true if the recommended weather is Sunny.
+    private boolean isSunnyWeather(Event event) {
+        return "Sunny".equalsIgnoreCase(event.getRecommendedWeather());
+    }
+
+    // Returns the selected top item.
     public ClothingItem getSelectedTop() {
         return selectedTop;
     }
 
+    // Returns the selected bottom item.
     public ClothingItem getSelectedBottom() {
         return selectedBottom;
     }
 
+    // Returns the selected outerwear item (may be null).
     public ClothingItem getSelectedOuterwear() {
         return selectedOuterwear;
     }
 
-    public ClothingItem getSelectedShoes() {
-        return selectedShoes;
+    // Returns the selected shoe item.
+    public ClothingItem getSelectedShoe() {
+        return selectedShoe;
     }
 
+    // Returns the selected hat item (may be null).
     public ClothingItem getSelectedHat() {
         return selectedHat;
     }
 
-    /**
-     * Returns a text summary of the generated outfit.
-     * This can be printed to the console or shown in a future JavaFX UI.
-     */
+    // Returns a printable summary of the current outfit selection.
     public String getOutfitSummaryText() {
+
         if (selectedTop == null && selectedBottom == null
-                && selectedShoes == null && selectedOuterwear == null
+                && selectedShoe == null && selectedOuterwear == null
                 && selectedHat == null) {
-            return "No outfit could be generated. " +
-                    "Please add more items or check your event details.";
+            return "No outfit could be generated. Please add more items or check your event details.";
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Recommended Outfit:\n");
+        String summary = "Recommended Outfit:\n";
 
         if (selectedTop != null) {
-            sb.append("Top: ").append(selectedTop.getDisplayText()).append("\n");
+            summary += "Top: " + selectedTop.getDisplayText() + "\n";
         }
         if (selectedBottom != null) {
-            sb.append("Bottom: ").append(selectedBottom.getDisplayText()).append("\n");
+            summary += "Bottom: " + selectedBottom.getDisplayText() + "\n";
         }
         if (selectedOuterwear != null) {
-            sb.append("Outerwear: ").append(selectedOuterwear.getDisplayText()).append("\n");
+            summary += "Outerwear: " + selectedOuterwear.getDisplayText() + "\n";
         }
-        if (selectedShoes != null) {
-            sb.append("Shoes: ").append(selectedShoes.getDisplayText()).append("\n");
+        if (selectedShoe != null) {
+            summary += "Shoes: " + selectedShoe.getDisplayText() + "\n";
         }
         if (selectedHat != null) {
-            sb.append("Hat: ").append(selectedHat.getDisplayText()).append("\n");
+            summary += "Hat: " + selectedHat.getDisplayText() + "\n";
         }
 
-        return sb.toString();
+        return summary;
     }
 }

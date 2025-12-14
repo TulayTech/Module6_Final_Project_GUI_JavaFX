@@ -1,352 +1,326 @@
 /**
- * AUTOMATED STYLIST APP: GUI LAYER
- * GUI layer. Uses non-GUI model classes (Wardrobe, OutfitGenerator, Event, and ClothingItem subclasses)
+ * Automated Stylist App (JavaFX)
+ * GUI layer for the wardrobe model (Wardrobe, Event, OutfitGenerator, ClothingItem).
  */
 
-import javafx.application.Application;              // Base import for all JavaFX apps
-import javafx.collections.FXCollections;            // For ObservableList and other GUI collections
-import javafx.collections.ObservableList;
+import javafx.application.Application;              // JavaFX app entry point
+import javafx.collections.FXCollections;            // Builds observable lists for ListView
+import javafx.collections.ObservableList;           // List type used by JavaFX controls
 
-import javafx.geometry.Insets;                     // Spacing
-import javafx.geometry.Pos;                        // Alignment
+import javafx.geometry.Insets;                      // Padding around layouts
+import javafx.geometry.Pos;                         // Alignment inside layouts
 
-import javafx.scene.Scene;                         // Scene
-import javafx.scene.control.*;                     // UI Controls
-import javafx.scene.layout.*;                      // Layouts
-import javafx.stage.Stage;                         // Stage
+import javafx.scene.Scene;                          // Holds the UI
+import javafx.scene.control.*;                      // Buttons, labels, fields, alerts, etc.
+import javafx.scene.layout.*;                       // VBox, HBox, GridPane
+import javafx.stage.Stage;                          // App window
 
 public class AutomatedStylistApp extends Application {
 
-    // ================== NON-GUI LOGIC OBJECTS ==================
-    private final Wardrobe wardrobe = new Wardrobe();                    // Starts empty, ready to store items
-    private final OutfitGenerator outfitGenerator = new OutfitGenerator(wardrobe); // Needs wardrobe to generate outfits
+    // Model objects
+    private final Wardrobe wardrobe = new Wardrobe();
+    private final OutfitGenerator outfitGenerator = new OutfitGenerator(wardrobe);
 
-    // ================== STAGE AND SCENE ==================
-    private Stage primaryStage;
+    // Navigation
+    private Stage mainStage;
     private Scene homeScene;
 
-    // ================== START ==================
     @Override
     public void start(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-        primaryStage.setTitle("Automated Stylist App");
+        mainStage = primaryStage;
+        mainStage.setTitle("Automated Stylist App");
 
-        // Seed starter items so the app can generate outfits right away
         seedSampleWardrobe();
 
-        // Create and set the home scene
         homeScene = buildHomeScene();
-        primaryStage.setScene(homeScene);
-        primaryStage.show();
+        mainStage.setScene(homeScene);
+        mainStage.show();
     }
 
-    // ================== BUILD HOME SCENE ==================
+    // Home screen with navigation buttons
     private Scene buildHomeScene() {
-        Label title = new Label("Welcome to the Automated Stylist App!");
-        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        Label titleLabel = new Label("Automated Stylist App");
+        titleLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
 
-        Button bottomsButton = new Button("Bottoms");
         Button topsButton = new Button("Tops");
-        Button hatsButton = new Button("Hats");
-        Button shoesButton = new Button("Shoes");
+        Button bottomsButton = new Button("Bottoms");
         Button outerwearButton = new Button("Outerwear");
-        Button generateOutfitButton = new Button("Generate Outfit");
+        Button shoesButton = new Button("Shoes");
+        Button hatsButton = new Button("Hats");
+        Button generateButton = new Button("Generate Outfit");
 
-        // EVENT HANDLERS FOR BUTTONS
-        // IMPORTANT: category keys must match helper switches: "Bottom", "Top", "Hats", "Shoes", "Outerwear"
-        bottomsButton.setOnAction(e -> primaryStage.setScene(buildCategoryScene("Bottom")));
-        topsButton.setOnAction(e -> primaryStage.setScene(buildCategoryScene("Top")));
-        hatsButton.setOnAction(e -> primaryStage.setScene(buildCategoryScene("Hats")));
-        shoesButton.setOnAction(e -> primaryStage.setScene(buildCategoryScene("Shoes")));
-        outerwearButton.setOnAction(e -> primaryStage.setScene(buildCategoryScene("Outerwear")));
-        generateOutfitButton.setOnAction(e -> primaryStage.setScene(buildGenerateScene()));
+        topsButton.setOnAction(e -> mainStage.setScene(buildCategoryScene("Top")));
+        bottomsButton.setOnAction(e -> mainStage.setScene(buildCategoryScene("Bottom")));
+        outerwearButton.setOnAction(e -> mainStage.setScene(buildCategoryScene("Outerwear")));
+        shoesButton.setOnAction(e -> mainStage.setScene(buildCategoryScene("Shoes")));
+        hatsButton.setOnAction(e -> mainStage.setScene(buildCategoryScene("Hats")));
+        generateButton.setOnAction(e -> mainStage.setScene(buildGenerateScene()));
 
-        // LAYOUT
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setHgap(12);
-        grid.setVgap(12);
+        GridPane menuGrid = new GridPane();
+        menuGrid.setAlignment(Pos.CENTER);
+        menuGrid.setHgap(12);
+        menuGrid.setVgap(12);
 
-        grid.add(bottomsButton, 0, 0);
-        grid.add(topsButton, 1, 0);
-        grid.add(hatsButton, 0, 1);
-        grid.add(shoesButton, 1, 1);
-        grid.add(outerwearButton, 0, 2);
-        grid.add(generateOutfitButton, 1, 2);
+        menuGrid.add(topsButton, 0, 0);
+        menuGrid.add(bottomsButton, 1, 0);
+        menuGrid.add(outerwearButton, 0, 1);
+        menuGrid.add(shoesButton, 1, 1);
+        menuGrid.add(hatsButton, 0, 2);
+        menuGrid.add(generateButton, 1, 2);
 
-        VBox root = new VBox(18, title, grid);
-        root.setPadding(new Insets(24));
+        VBox root = new VBox(18, titleLabel, menuGrid);
         root.setAlignment(Pos.CENTER);
+        root.setPadding(new Insets(24));
 
         return new Scene(root, 820, 520);
     }
 
-    // ================== BUILD CATEGORY SCENE ==================
+    // Screen for one category: view/add/remove
     private Scene buildCategoryScene(String categoryKey) {
-        Label header = new Label("Category: " + categoryLabel(categoryKey));
-        header.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        Label headerLabel = new Label(categoryTitle(categoryKey));
+        headerLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
-        // ListView showing current items in that category
-        ListView<ClothingItem> listView = new ListView<>();
-        refreshList(listView, categoryKey);
+        ListView<ClothingItem> itemListView = new ListView<>();
+        updateListView(itemListView, categoryKey);
 
-        // Fields for adding a new item
+        // Input fields
         TextField nameField = new TextField();
-        nameField.setPromptText("Item Name");
+        nameField.setPromptText("Item Name (required)");
 
         TextField typeField = new TextField();
-        typeField.setPromptText("Type (e.g., Blazer, Jeans)");
+        typeField.setPromptText("Type (required)");
 
         TextField colorField = new TextField();
-        colorField.setPromptText("Color (e.g., Blue)");
+        colorField.setPromptText("Color");
 
         TextField codeField = new TextField();
-        codeField.setPromptText("Code (e.g., TOP-BLU-POL)");
+        codeField.setPromptText("Code");
 
-        TextField descField = new TextField();
-        descField.setPromptText("Description");
+        TextField descriptionField = new TextField();
+        descriptionField.setPromptText("Description");
 
-        Button addButton = new Button("Add Item");
+        Button addButton = new Button("Add");
         Button deleteButton = new Button("Delete Selected");
         Button backButton = new Button("Back");
 
-        // ADD BUTTON EVENT HANDLER
         addButton.setOnAction(e -> {
-            // IMPORTANT: method signature expects (name, type, desc, color, code)
-            ClothingItem created = createItemFromInputs(
+            ClothingItem newItem = buildItem(
                     categoryKey,
                     nameField.getText(),
                     typeField.getText(),
-                    descField.getText(),
+                    descriptionField.getText(),
                     colorField.getText(),
                     codeField.getText()
             );
 
-            if (created == null) {
-                showError("Invalid input", "Please fill in at least the Name and Type.");
+            if (newItem == null) {
+                showError("Invalid input", "Name and Type are required.");
                 return;
             }
 
-            addItemToWardrobe(categoryKey, created);
+            addToWardrobe(categoryKey, newItem);
 
-            // Clear inputs
             nameField.clear();
             typeField.clear();
             colorField.clear();
             codeField.clear();
-            descField.clear();
+            descriptionField.clear();
 
-            // Refresh list
-            refreshList(listView, categoryKey);
+            updateListView(itemListView, categoryKey);
         });
 
-        // DELETE BUTTON EVENT HANDLER
         deleteButton.setOnAction(e -> {
-            ClothingItem selected = listView.getSelectionModel().getSelectedItem();
+            ClothingItem selected = itemListView.getSelectionModel().getSelectedItem();
             if (selected == null) {
-                showError("No item selected", "Please select an item to delete.");
+                showError("No selection", "Select an item to delete.");
                 return;
             }
 
-            removeItemFromWardrobe(categoryKey, selected);
-            refreshList(listView, categoryKey);
+            removeFromWardrobe(categoryKey, selected);
+            updateListView(itemListView, categoryKey);
         });
 
-        // BACK BUTTON EVENT HANDLER
-        backButton.setOnAction(e -> primaryStage.setScene(homeScene));
+        backButton.setOnAction(e -> mainStage.setScene(homeScene));
 
-        // LAYOUT
-        VBox left = new VBox(10, new Label("Items:"), listView);
-        left.setPrefWidth(420);
+        // Left side: list
+        VBox leftPane = new VBox(10, new Label("Items:"), itemListView);
+        leftPane.setPrefWidth(420);
 
-        GridPane form = new GridPane();
-        form.setHgap(10);
-        form.setVgap(10);
+        // Right side: form
+        GridPane formGrid = new GridPane();
+        formGrid.setHgap(10);
+        formGrid.setVgap(10);
 
-        form.add(new Label("Name:"), 0, 0);
-        form.add(nameField, 1, 0);
+        formGrid.add(new Label("Name:"), 0, 0);
+        formGrid.add(nameField, 1, 0);
 
-        form.add(new Label("Type:"), 0, 1);
-        form.add(typeField, 1, 1);
+        formGrid.add(new Label("Type:"), 0, 1);
+        formGrid.add(typeField, 1, 1);
 
-        form.add(new Label("Color:"), 0, 2);
-        form.add(colorField, 1, 2);
+        formGrid.add(new Label("Color:"), 0, 2);
+        formGrid.add(colorField, 1, 2);
 
-        form.add(new Label("Code:"), 0, 3);
-        form.add(codeField, 1, 3);
+        formGrid.add(new Label("Code:"), 0, 3);
+        formGrid.add(codeField, 1, 3);
 
-        form.add(new Label("Description:"), 0, 4);
-        form.add(descField, 1, 4);
+        formGrid.add(new Label("Description:"), 0, 4);
+        formGrid.add(descriptionField, 1, 4);
 
         HBox formButtons = new HBox(10, addButton, deleteButton, backButton);
         formButtons.setAlignment(Pos.CENTER_LEFT);
 
-        VBox right = new VBox(14, new Label("Add Item:"), form, formButtons);
-        right.setPadding(new Insets(0, 0, 0, 10));
+        VBox rightPane = new VBox(14, new Label("Add Item:"), formGrid, formButtons);
+        rightPane.setPadding(new Insets(0, 0, 0, 10));
 
-        HBox contentBox = new HBox(14, left, right);
-        contentBox.setPadding(new Insets(20));
+        HBox contentRow = new HBox(14, leftPane, rightPane);
+        contentRow.setPadding(new Insets(20));
 
-        VBox root = new VBox(12, header, contentBox);
+        VBox root = new VBox(12, headerLabel, contentRow);
         root.setPadding(new Insets(16));
 
         return new Scene(root, 980, 560);
     }
 
-    // ================== BUILD GENERATE SCENE ==================
+    // Screen for generating an outfit from an Event
     private Scene buildGenerateScene() {
-        Label header = new Label("Generate Outfit");
-        header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        Label headerLabel = new Label("Generate Outfit");
+        headerLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        TextField eventName = new TextField();
-        eventName.setPromptText("Event Name (required)");
+        TextField eventNameField = new TextField();
+        eventNameField.setPromptText("Event Name (required)");
 
-        TextField location = new TextField();
-        location.setPromptText("Location");
+        TextField locationField = new TextField();
+        locationField.setPromptText("Location");
 
-        TextField time = new TextField();
-        time.setPromptText("Time");
+        TextField timeField = new TextField();
+        timeField.setPromptText("Time");
 
-        ComboBox<String> eventType = new ComboBox<>();
-        eventType.getItems().addAll("Business", "Casual", "Athletic");
-        eventType.setValue("Casual");
+        ComboBox<String> eventTypeBox = new ComboBox<>();
+        eventTypeBox.getItems().addAll("Business", "Casual", "Athletic");
+        eventTypeBox.setValue("Casual");
 
-        ComboBox<String> weather = new ComboBox<>();
-        weather.getItems().addAll("Cold", "Warm", "Rainy", "Sunny");
-        weather.setValue("Warm");
+        ComboBox<String> weatherBox = new ComboBox<>();
+        weatherBox.getItems().addAll("Cold", "Warm", "Rainy", "Sunny");
+        weatherBox.setValue("Warm");
 
-        TextArea output = new TextArea();
-        output.setEditable(false);
-        output.setWrapText(true);
-        output.setPrefHeight(220);
+        TextArea outputArea = new TextArea();
+        outputArea.setEditable(false);
+        outputArea.setWrapText(true);
+        outputArea.setPrefHeight(220);
 
-        Button generateBtn = new Button("Generate");
-        Button backBtn = new Button("Back");
+        Button generateButton = new Button("Generate");
+        Button backButton = new Button("Back");
 
-        // GENERATE OUTFIT EVENT HANDLER
-        generateBtn.setOnAction(e -> {
-            Event ev = new Event(
-                    eventName.getText(),
-                    location.getText(),
-                    time.getText(),
-                    eventType.getValue(),
-                    weather.getValue()
+        generateButton.setOnAction(e -> {
+            Event event = new Event(
+                    eventNameField.getText(),
+                    locationField.getText(),
+                    timeField.getText(),
+                    eventTypeBox.getValue(),
+                    weatherBox.getValue()
             );
 
-            if (!ev.isValid()) {
-                showError("Invalid Event", "Event Name and Event Type are required.");
+            if (!event.isValid()) {
+                showError("Invalid event", "Event Name and Event Type are required.");
                 return;
             }
 
-            outfitGenerator.generateOutfit(ev);
-            output.setText(outfitGenerator.getOutfitSummaryText());
+            outfitGenerator.generateOutfit(event);
+            outputArea.setText(outfitGenerator.getOutfitSummaryText());
         });
 
-        backBtn.setOnAction(e -> primaryStage.setScene(homeScene));
+        backButton.setOnAction(e -> mainStage.setScene(homeScene));
 
-        GridPane form = new GridPane();
-        form.setHgap(10);
-        form.setVgap(10);
+        GridPane formGrid = new GridPane();
+        formGrid.setHgap(10);
+        formGrid.setVgap(10);
 
-        form.add(new Label("Event Name:"), 0, 0);
-        form.add(eventName, 1, 0);
+        formGrid.add(new Label("Event Name:"), 0, 0);
+        formGrid.add(eventNameField, 1, 0);
 
-        form.add(new Label("Location:"), 0, 1);
-        form.add(location, 1, 1);
+        formGrid.add(new Label("Location:"), 0, 1);
+        formGrid.add(locationField, 1, 1);
 
-        form.add(new Label("Time:"), 0, 2);
-        form.add(time, 1, 2);
+        formGrid.add(new Label("Time:"), 0, 2);
+        formGrid.add(timeField, 1, 2);
 
-        form.add(new Label("Event Type:"), 0, 3);
-        form.add(eventType, 1, 3);
+        formGrid.add(new Label("Event Type:"), 0, 3);
+        formGrid.add(eventTypeBox, 1, 3);
 
-        form.add(new Label("Weather:"), 0, 4);
-        form.add(weather, 1, 4);
+        formGrid.add(new Label("Weather:"), 0, 4);
+        formGrid.add(weatherBox, 1, 4);
 
-        HBox buttons = new HBox(10, generateBtn, backBtn);
+        HBox buttons = new HBox(10, generateButton, backButton);
         buttons.setAlignment(Pos.CENTER_LEFT);
 
-        VBox root = new VBox(14, header, form, buttons, new Label("Output:"), output);
+        VBox root = new VBox(14, headerLabel, formGrid, buttons, new Label("Output:"), outputArea);
         root.setPadding(new Insets(20));
 
         return new Scene(root, 860, 560);
     }
 
-    // ================== HELPER METHODS ==================
-    private void refreshList(ListView<ClothingItem> listView, String categoryKey) {
+    // Loads items from the Wardrobe into the ListView
+    private void updateListView(ListView<ClothingItem> listView, String categoryKey) {
         ObservableList<ClothingItem> items = FXCollections.observableArrayList();
 
-        switch (categoryKey) {
-            case "Outerwear" -> items.addAll(wardrobe.getOuterwear());
-            case "Top" -> items.addAll(wardrobe.getTops());
-            case "Bottom" -> items.addAll(wardrobe.getBottoms());
-            case "Shoes" -> items.addAll(wardrobe.getShoes());
-            case "Hats" -> items.addAll(wardrobe.getHats());
-        }
+        if (categoryKey.equals("Outerwear")) items.addAll(wardrobe.getOuterwear());
+        else if (categoryKey.equals("Top")) items.addAll(wardrobe.getTops());
+        else if (categoryKey.equals("Bottom")) items.addAll(wardrobe.getBottoms());
+        else if (categoryKey.equals("Shoes")) items.addAll(wardrobe.getShoes());
+        else if (categoryKey.equals("Hats")) items.addAll(wardrobe.getHats());
 
         listView.setItems(items);
     }
 
-    private String categoryLabel(String key) {
-        return switch (key) {
-            case "Outerwear" -> "Outerwear";
-            case "Top" -> "Tops";
-            case "Bottom" -> "Bottoms";
-            case "Shoes" -> "Shoes";
-            case "Hats" -> "Hats";
-            default -> key;
-        };
+    // Builds a label for the screen header
+    private String categoryTitle(String categoryKey) {
+        if (categoryKey.equals("Top")) return "Category: Tops";
+        if (categoryKey.equals("Bottom")) return "Category: Bottoms";
+        if (categoryKey.equals("Outerwear")) return "Category: Outerwear";
+        if (categoryKey.equals("Shoes")) return "Category: Shoes";
+        if (categoryKey.equals("Hats")) return "Category: Hats";
+        return "Category";
     }
 
-    /**
-     * Creates a ClothingItem based on the category and inputs.
-     * Returns null if minimum required fields are missing.
-     */
-    private ClothingItem createItemFromInputs(String categoryKey,
-                                              String name,
-                                              String type,
-                                              String desc,
-                                              String color,
-                                              String code) {
+    // Creates the correct subclass for the selected category
+    private ClothingItem buildItem(String categoryKey,
+                                String name,
+                                String type,
+                                String description,
+                                String color,
+                                String code) {
 
-        // Basic validation: Name and Type should exist
-        if (name == null || name.isBlank() || type == null || type.isBlank()) {
-            return null;
-        }
+        if (name == null || name.trim().isEmpty()) return null;
+        if (type == null || type.trim().isEmpty()) return null;
 
-        return switch (categoryKey) {
-            case "Outerwear" -> new OuterwearItem(name, type, desc, color, code);
-            case "Top" -> new TopItem(name, type, desc, color, code);
-            case "Bottom" -> new BottomItem(name, type, desc, color, code);
+        if (categoryKey.equals("Outerwear")) return new OuterwearItem(name, type, description, color, code);
+        if (categoryKey.equals("Top")) return new TopItem(name, type, description, color, code);
+        if (categoryKey.equals("Bottom")) return new BottomItem(name, type, description, color, code);
+        if (categoryKey.equals("Shoes")) return new ShoeItem(name, type, description, color, code);
+        if (categoryKey.equals("Hats")) return new HatItem(name, type, description, color, code);
 
-            // Temporary storage if you don't have ShoeItem / HatItem classes yet
-            case "Shoes" -> new TopItem(name, "Shoes - " + type, desc, color, code);
-            case "Hats" -> new TopItem(name, "Hat - " + type, desc, color, code);
-
-            default -> null;
-        };
+        return null;
     }
 
-    private void addItemToWardrobe(String categoryKey, ClothingItem item) {
-        switch (categoryKey) {
-            case "Outerwear" -> wardrobe.addOuterwear(item);
-            case "Top" -> wardrobe.addTop(item);
-            case "Bottom" -> wardrobe.addBottom(item);
-            case "Shoes" -> wardrobe.addShoes(item);
-            case "Hats" -> wardrobe.addHat(item);
-        }
+    // Adds an item to the correct wardrobe list
+    private void addToWardrobe(String categoryKey, ClothingItem item) {
+        if (categoryKey.equals("Outerwear")) wardrobe.addOuterwear(item);
+        else if (categoryKey.equals("Top")) wardrobe.addTop(item);
+        else if (categoryKey.equals("Bottom")) wardrobe.addBottom(item);
+        else if (categoryKey.equals("Shoes")) wardrobe.addShoe(item);
+        else if (categoryKey.equals("Hats")) wardrobe.addHat(item);
     }
 
-    private void removeItemFromWardrobe(String categoryKey, ClothingItem item) {
-        switch (categoryKey) {
-            case "Outerwear" -> wardrobe.removeOuterwear(item);
-            case "Top" -> wardrobe.removeTop(item);
-            case "Bottom" -> wardrobe.removeBottom(item);
-            case "Shoes" -> wardrobe.removeShoes(item);
-            case "Hats" -> wardrobe.removeHat(item);
-        }
+    // Removes an item from the correct wardrobe list
+    private void removeFromWardrobe(String categoryKey, ClothingItem item) {
+        if (categoryKey.equals("Outerwear")) wardrobe.removeOuterwear(item);
+        else if (categoryKey.equals("Top")) wardrobe.removeTop(item);
+        else if (categoryKey.equals("Bottom")) wardrobe.removeBottom(item);
+        else if (categoryKey.equals("Shoes")) wardrobe.removeShoe(item);
+        else if (categoryKey.equals("Hats")) wardrobe.removeHat(item);
     }
 
+    // Simple error dialog
     private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
@@ -355,16 +329,20 @@ public class AutomatedStylistApp extends Application {
         alert.showAndWait();
     }
 
+    // Starter data for testing the UI quickly
     private void seedSampleWardrobe() {
         wardrobe.addTop(new TopItem("White Dress Shirt", "Dress Shirt", "Slim fit, long sleeve", "White", "TOP-WHT-DRS"));
         wardrobe.addTop(new TopItem("Black T-Shirt", "T-Shirt", "Casual crew neck", "Black", "TOP-BLK-TSH"));
+
         wardrobe.addBottom(new BottomItem("Navy Dress Pants", "Dress Pants", "Stretch fit", "Navy", "BOT-NVY-DRS"));
         wardrobe.addBottom(new BottomItem("Black Jeans", "Jeans", "Casual denim", "Black", "BOT-BLK-JNS"));
+
         wardrobe.addOuterwear(new OuterwearItem("Gray Blazer", "Blazer", "Business outerwear", "Gray", "OUT-GRY-BLZ"));
 
-        wardrobe.addShoes(new TopItem("Brown Dress Shoes", "Shoes", "Formal leather shoes", "Brown", "SHO-BRN-DRS"));
-        wardrobe.addShoes(new TopItem("White Sneakers", "Shoes", "Everyday sneakers", "White", "SHO-WHT-SNK"));
-        wardrobe.addHat(new TopItem("Black Baseball Cap", "Hat", "Sunny day cap", "Black", "HAT-BLK-CAP"));
+        wardrobe.addShoe(new ShoeItem("Brown Dress Shoes", "Dress Shoes", "Formal leather shoes", "Brown", "SHO-BRN-DRS"));
+        wardrobe.addShoe(new ShoeItem("White Sneakers", "Sneakers", "Everyday sneakers", "White", "SHO-WHT-SNK"));
+
+        wardrobe.addHat(new HatItem("Black Baseball Cap", "Baseball Cap", "Sunny day cap", "Black", "HAT-BLK-CAP"));
     }
 
     public static void main(String[] args) {
